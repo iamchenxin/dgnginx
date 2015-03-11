@@ -1,0 +1,96 @@
+server {
+	listen 80 default_server;
+	root /var/www/qituc;
+	server_name qituc.com a.qituc.com;
+	index index.html;
+	
+}
+
+server {
+	listen 80 ;
+        server_name b.qituc.com;
+
+	root /var/www/qb;
+
+	index index.html;
+location / {
+        index   index.html index.php;
+    }
+
+}
+
+server{
+	listen 80;
+	server_name dict.qituc.com;
+
+	index index.html index.php index.htm;
+
+	
+	root /var/www/dict/;
+	
+	location / { try_files $uri $uri/ @mdsr; }
+    location @mdsr {
+	rewrite ^/dt/(.*) /dv.php?dt=$1 last;
+	rewrite ^/dv/(.*) /dv.php?dv=$1 last;
+    }
+
+	location /dict/{
+		internal;
+		alias /var/media/dict/;
+	}
+
+    location ~ \.php$ {
+    
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+client_max_body_size 100m;
+client_body_temp_path /var/www/wiki/nginx_temp;
+        include fastcgi_params;
+    }
+
+
+}
+
+server {
+    listen 80 ;
+
+    root /var/www/wiki;
+    index index.php index.html index.htm;
+
+    server_name wiki.qituc.com;
+
+    location / { try_files $uri $uri/ @dokuwiki; }
+
+    location @dokuwiki {
+        rewrite ^/_media/(.*) /lib/exe/fetch.php?media=$1 last;
+        rewrite ^/_detail/(.*) /lib/exe/detail.php?media=$1 last;
+        rewrite ^/_export/([^/]+)/(.*) /doku.php?do=export_$1&id=$2 last;
+        rewrite ^/(.*) /doku.php?id=$1&$args last;
+    }
+
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /var/www/wiki;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+client_max_body_size 100m;
+client_body_temp_path /var/www/wiki/nginx_temp;
+        include fastcgi_params;
+    }
+	location ~ /(data|conf|bin|inc)/ {
+      deny all;
+    }
+	
+	location ~ /\.ht {
+      deny  all;
+    }
+}

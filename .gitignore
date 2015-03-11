@@ -1,0 +1,10 @@
+*.*
+*/*
+ko*
+*params
+win*
+!.gitignore
+!*.conf
+!sites-enabled/*
+!sites-available/*
+
