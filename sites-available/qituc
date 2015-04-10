@@ -1,11 +1,13 @@
+## default site for qituc.com
 server {
 	listen 80 default_server;
-	root /var/www/qituc;
+	root /var/www/qituc/def;
 	server_name qituc.com a.qituc.com;
 	index index.html;
 	
 }
 
+## a test server
 server {
 	listen 80 ;
         server_name b.qituc.com;
@@ -19,6 +21,7 @@ location / {
 
 }
 
+# dict.qituc.com , server for word voice 
 server{
 	listen 80;
 	server_name dict.qituc.com;
@@ -49,17 +52,17 @@ client_max_body_size 100m;
 client_body_temp_path /var/www/wiki/nginx_temp;
         include fastcgi_params;
     }
-
-
 }
 
+
+# site d.qituc.com for dictionary! 
 server {
     listen 80 ;
 
-    root /var/www/wiki;
+    root /var/www/qituc/d;
     index index.php index.html index.htm;
 
-    server_name wiki.qituc.com;
+    server_name d.qituc.com;
 
     location / { try_files $uri $uri/ @dokuwiki; }
 
@@ -73,7 +76,7 @@ server {
     error_page 404 /404.html;
     error_page 500 502 503 504 /50x.html;
     location = /50x.html {
-        root /var/www/wiki;
+        root /var/www/qituc/d;
     }
 
     location ~ \.php$ {
@@ -83,7 +86,50 @@ server {
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 client_max_body_size 100m;
-client_body_temp_path /var/www/wiki/nginx_temp;
+client_body_temp_path /var/www/nginx_tmp;
+        include fastcgi_params;
+    }
+	location ~ /(data|conf|bin|inc)/ {
+      deny all;
+    }
+	
+	location ~ /\.ht {
+      deny  all;
+    }
+}
+
+# site e.qituc.com for english learning! 
+server {
+    listen 80 ;
+
+    root /var/www/qituc/e;
+    index index.php index.html index.htm;
+
+    server_name e.qituc.com;
+
+    location / { try_files $uri $uri/ @dokuwiki; }
+
+    location @dokuwiki {
+        rewrite ^/_media/(.*) /lib/exe/fetch.php?media=$1 last;
+        rewrite ^/_detail/(.*) /lib/exe/detail.php?media=$1 last;
+        rewrite ^/_export/([^/]+)/(.*) /doku.php?do=export_$1&id=$2 last;
+        rewrite ^/(.*) /doku.php?id=$1&$args last;
+    }
+
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /var/www/qituc/e;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+client_max_body_size 100m;
+client_body_temp_path /var/www/nginx_tmp;
         include fastcgi_params;
     }
 	location ~ /(data|conf|bin|inc)/ {

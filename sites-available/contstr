@@ -1,8 +1,18 @@
+## default site for contstr.com
+server {
+	listen 80 default_server;
+	root /var/www/contstr/def;
+	server_name contstr.com www.contstr.com;
+	index index.html;
+	
+}
+
+## w.contstr.com  wiki for contstr ,my wiki
 server {
     listen 80 ;
-    root /var/www/ctwiki;
+    root /var/www/contstr/wiki;
     index index.php index.html index.htm;
-    server_name wiki.contstr.com;
+    server_name w.contstr.com;
 
     location / { try_files $uri $uri/ @dokuwiki; }
     location @dokuwiki {
@@ -14,7 +24,7 @@ server {
     error_page 404 /404.html;
     error_page 500 502 503 504 /50x.html;
     location = /50x.html {
-        root /var/www/ctwiki;
+        root /var/www/contstr/wiki;
     }
     location ~ \.php$ {
         try_files $uri =404;
