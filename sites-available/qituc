@@ -1,6 +1,6 @@
 ## default site for qituc.com
 server {
-	listen 80 default_server;
+	listen 80;
 	root /var/www/qituc/def;
 	server_name qituc.com a.qituc.com;
 	index index.html;
@@ -49,7 +49,7 @@ server{
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 client_max_body_size 100m;
-client_body_temp_path /var/www/wiki/nginx_temp;
+client_body_temp_path /var/www/nginx_tmp;
         include fastcgi_params;
     }
 }
